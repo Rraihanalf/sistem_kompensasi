@@ -10,6 +10,7 @@
 // Jika form disubmit
 if (isset($_POST['submit'])) {
     // Ambil data dari form
+    $id_pengawas = mysqli_real_escape_string($conn, $_POST['id_pengawas']);
     $nim = mysqli_real_escape_string($conn, $_POST['nim']);
     $jam = mysqli_real_escape_string($conn, $_POST['jam']);
     $tanggal = mysqli_real_escape_string($conn, $_POST['tanggal']);
@@ -17,7 +18,7 @@ if (isset($_POST['submit'])) {
     $status = mysqli_real_escape_string($conn, $_POST['status']);
 
     // Simpan data ke database
-    $query = "INSERT INTO kompensasi (nim, jam, tanggal, validasi, status) VALUES ('$nim', '$jam', '$tanggal', '$validasi', '$status')";
+    $query = "INSERT INTO kompensasi (id_pengawas, nim, jam, tanggal, validasi, status) VALUES ('$id_pengawas', '$nim', '$jam', '$tanggal', '$validasi', '$status')";
     if (mysqli_query($conn, $query)) {
         $script = "
             Swal.fire({
@@ -44,14 +45,14 @@ if (isset($_POST['submit'])) {
 if (isset($_POST['edit'])) {
     // Ambil data dari form
     $id = mysqli_real_escape_string($conn, $_POST['id']);
-    $nim = mysqli_real_escape_string($conn, $_POST['nim']);
     $jam = mysqli_real_escape_string($conn, $_POST['jam']);
     $tanggal = mysqli_real_escape_string($conn, $_POST['tanggal']);
+    $kegiatan = mysqli_real_escape_string($conn, $_POST['kegiatan']);
     $validasi = mysqli_real_escape_string($conn, $_POST['validasi']);
     $status = mysqli_real_escape_string($conn, $_POST['status']);
 
     // Update data
-    $query = "UPDATE kompensasi SET nim = '$nim', jam = '$jam', tanggal = '$tanggal', validasi = '$validasi', status = '$status' WHERE id = '$id'";
+    $query = "UPDATE kompensasi SET jam = '$jam', tanggal = '$tanggal', kegiatan = '$kegiatan', validasi = '$validasi', status = '$status' WHERE id = '$id'";
 
     if (mysqli_query($conn, $query)) {
         $script = "
@@ -153,6 +154,19 @@ if (isset($_POST['hapus'])) {
                                         </select>
                                     </div>
                                     <div class="form-group">
+                                        <label for="id_pengawas">Pengawas:</label>
+                                        <select class="form-control" id="id_pengawas" name="id_pengawas" required>
+                                            <?php
+                                            $stmt = $conn->prepare("SELECT * FROM pengawas");
+                                            $stmt->execute();
+                                            $pengawas = $stmt->get_result();
+                                            ?>
+                                            <?php foreach ($pengawas as $data) : ?>
+                                                <option value="<?= htmlspecialchars($data['id']); ?>"><?= htmlspecialchars($data['nama']); ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
                                         <label for="jam">Jam:</label>
                                         <input type="time" class="form-control" id="jam" name="jam" required>
                                     </div>
@@ -185,7 +199,7 @@ if (isset($_POST['hapus'])) {
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Data Kompensasi <a class="badge bg-info text-white" href="cetak.php>">Cetak Data Kompensasi</a></h6>
+                            <h6 class="m-0 font-weight-bold text-primary">Data Kompensasi <a class="badge bg-info text-white" href="cetak.php">Cetak Data Kompensasi</a></h6>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -194,6 +208,7 @@ if (isset($_POST['hapus'])) {
                                         <tr>
                                             <th>#</th>
                                             <th>NIM</th>
+                                            <th>Pengawas</th>
                                             <th>Jam</th>
                                             <th>Tanggal</th>
                                             <th>Validasi</th>
@@ -203,7 +218,7 @@ if (isset($_POST['hapus'])) {
                                     </thead>
                                     <tbody>
                                         <?php
-                                        $stmt = $conn->prepare("SELECT * FROM kompensasi");
+                                        $stmt = $conn->prepare("SELECT kompensasi.*, mahasiswa.nama AS nama_mahasiswa, pengawas.nama AS nama_pengawas FROM kompensasi JOIN mahasiswa ON kompensasi.nim = mahasiswa.nim JOIN pengawas ON kompensasi.id_pengawas = pengawas.id");
                                         $stmt->execute();
                                         $kompensasi = $stmt->get_result();
                                         ?>
@@ -211,7 +226,8 @@ if (isset($_POST['hapus'])) {
                                         <?php foreach ($kompensasi as $data) : ?>
                                             <tr>
                                                 <td><?= $i; ?></td>
-                                                <td><?= htmlspecialchars($data['nim']); ?></td>
+                                                <td><?= htmlspecialchars($data['nim']); ?> | <?= htmlspecialchars($data['nama_mahasiswa']); ?></td>
+                                                <td><?= htmlspecialchars($data['nama_pengawas']); ?></td>
                                                 <td><?= $data['jam']; ?></td>
                                                 <td><?= $data['tanggal']; ?></td>
                                                 <td><?= $data['validasi']; ?></td>
@@ -237,16 +253,16 @@ if (isset($_POST['hapus'])) {
                                                             <form action="" method="POST">
                                                                 <input type="hidden" name="id" value="<?= $data['id']; ?>">
                                                                 <div class="form-group">
-                                                                    <label for="nim">NIM</label>
-                                                                    <input type="text" class="form-control" id="nim" name="nim" value="<?= $data['nim']; ?>" required>
-                                                                </div>
-                                                                <div class="form-group">
                                                                     <label for="jam">Jam</label>
                                                                     <input type="time" class="form-control" id="jam" name="jam" value="<?= $data['jam']; ?>" required>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="tanggal">Tanggal</label>
                                                                     <input type="date" class="form-control" id="tanggal" name="tanggal" value="<?= $data['tanggal']; ?>" required>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="kegiatan">Kegiatan</label>
+                                                                    <input type="text" class="form-control" id="kegiatan" name="kegiatan" value="<?= $data['kegiatan']; ?>" required>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="validasi">Validasi</label>

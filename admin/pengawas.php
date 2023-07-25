@@ -13,12 +13,13 @@ if (isset($_POST['submit'])) {
     $username = mysqli_real_escape_string($conn, $_POST['username']);
     $password = mysqli_real_escape_string($conn, $_POST['password']);
     $nama = mysqli_real_escape_string($conn, $_POST['nama']);
+    $no_wa = mysqli_real_escape_string($conn, $_POST['no_wa']);
 
     // Hash password menggunakan fungsi password_hash()
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
     // Simpan data ke database
-    $query = "INSERT INTO pengawas (username, password, nama) VALUES ('$username', '$hashedPassword', '$nama')";
+    $query = "INSERT INTO pengawas (username, password, nama, no_wa) VALUES ('$username', '$hashedPassword', '$nama', '$no_wa')";
     if (mysqli_query($conn, $query)) {
         $script = "
             Swal.fire({
@@ -48,16 +49,17 @@ if (isset($_POST['edit'])) {
     $username = mysqli_real_escape_string($conn, $_POST['username']);
     $password = mysqli_real_escape_string($conn, $_POST['password']);
     $nama = mysqli_real_escape_string($conn, $_POST['nama']);
+    $no_wa = mysqli_real_escape_string($conn, $_POST['no_wa']);
 
     // Cek apakah password kosong atau tidak
     if (!empty($password)) {
         // Hash password menggunakan fungsi password_hash()
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
         // Update data dengan password baru
-        $query = "UPDATE pengawas SET username = '$username', nama = '$nama', password = '$hashedPassword' WHERE id = '$id'";
+        $query = "UPDATE pengawas SET username = '$username', nama = '$nama', no_wa = '$no_wa', password = '$hashedPassword' WHERE id = '$id'";
     } else {
         // Update data tanpa mengubah password
-        $query = "UPDATE pengawas SET username = '$username', nama = '$nama' WHERE id = '$id'";
+        $query = "UPDATE pengawas SET username = '$username', nama = '$nama' , no_wa = '$no_wa' WHERE id = '$id'";
     }
 
     if (mysqli_query($conn, $query)) {
@@ -158,6 +160,10 @@ if (isset($_POST['hapus'])) {
                                         <label for="nama">Nama Lengkap:</label>
                                         <input type="text" class="form-control" id="nama" name="nama" required>
                                     </div>
+                                    <div class="form-group">
+                                        <label for="no_wa">Nomor Whatsapp:</label>
+                                        <input type="number" class="form-control" id="no_wa" name="no_wa" required>
+                                    </div>
                                     <button type="submit" name="submit" class="btn btn-primary w-100">Submit</button>
                                 </form>
                             </div>
@@ -177,6 +183,7 @@ if (isset($_POST['hapus'])) {
                                             <th>#</th>
                                             <th>Username</th>
                                             <th>Nama Lengkap</th>
+                                            <th>Nomor Whatsapp</th>
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
@@ -192,6 +199,7 @@ if (isset($_POST['hapus'])) {
                                                 <td><?= $i; ?></td>
                                                 <td><?= htmlspecialchars($data['username']); ?></td>
                                                 <td><?= htmlspecialchars($data['nama']); ?></td>
+                                                <td><?= htmlspecialchars($data['no_wa']); ?></td>
                                                 <td>
                                                     <a href="#" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editModal<?= $data['id'] ?>">Edit</a>
                                                     <br><br>
@@ -219,6 +227,10 @@ if (isset($_POST['hapus'])) {
                                                                 <div class="form-group">
                                                                     <label for="nama">Nama Lengkap</label>
                                                                     <input type="text" class="form-control" id="nama" name="nama" value="<?= $data['nama']; ?>" required>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="no_wa">Nomor Whatsapp</label>
+                                                                    <input type="text" class="form-control" id="no_wa" name="no_wa" value="<?= $data['no_wa']; ?>" required>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="password">Password</label>

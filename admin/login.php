@@ -62,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="d-flex flex-column">
                 <h4 class="mt-5 text-center">Sistem Kompensasi Teknik Elektro - Login Admin</h4>
                 <div class="d-flex justify-content-center">
-                    <img src="../img/logo.png" class="img-fluid" width="100" alt="">
+                    <img src="../img/poliban.jpg" class="img-fluid" width="100" alt="">
                 </div>
             </div>
             <div class="col-xl-10 col-lg-12 col-md-9 col-sm-12">
@@ -75,7 +75,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <div class="p-2">
                                     <form class="user" method="POST" action="">
                                         <div class="form-group">
-                                            <input type="text" class="form-control form-control-user" name="username" placeholder="Masukkan Username" required>
+                                            <input autofocus type="text" class="form-control form-control-user" name="username" placeholder="Masukkan Username" required>
                                         </div>
                                         <div class="form-group">
                                             <input type="password" class="form-control form-control-user" name="password" placeholder="Masukkan Password" required>

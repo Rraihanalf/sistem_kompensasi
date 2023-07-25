@@ -63,16 +63,17 @@ if (isset($_POST['edit'])) {
     $semester = mysqli_real_escape_string($conn, $_POST['semester']);
     $kelas = mysqli_real_escape_string($conn, $_POST['kelas']);
     $nohp = mysqli_real_escape_string($conn, $_POST['nohp']);
+    $jumlah_alpha = mysqli_real_escape_string($conn, $_POST['jumlah_alpha']);
 
     // Cek apakah password kosong atau tidak
     if (!empty($password)) {
         // Hash password menggunakan fungsi password_hash()
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
         // Update data dengan password baru
-        $query = "UPDATE mahasiswa SET username = '$username', username_pengawas = '$username_pengawas',  password = '$hashedPassword', nim = '$nim', nama = '$nama', jenis_kelamin = '$jenis_kelamin', jurusan = '$jurusan', prodi = '$prodi', semester = '$semester', kelas = '$kelas', nohp = '$nohp' WHERE id = '$id'";
+        $query = "UPDATE mahasiswa SET username = '$username', username_pengawas = '$username_pengawas',  password = '$hashedPassword', nim = '$nim', nama = '$nama', jenis_kelamin = '$jenis_kelamin', jurusan = '$jurusan', prodi = '$prodi', semester = '$semester', kelas = '$kelas', nohp = '$nohp', jumlah_alpha = '$jumlah_alpha' WHERE id = '$id'";
     } else {
         // Update data tanpa mengubah password
-        $query = "UPDATE mahasiswa SET username = '$username', username_pengawas = '$username_pengawas',  nim = '$nim', nama = '$nama', jenis_kelamin = '$jenis_kelamin', jurusan = '$jurusan', prodi = '$prodi', semester = '$semester', kelas = '$kelas', nohp = '$nohp' WHERE id = '$id'";
+        $query = "UPDATE mahasiswa SET username = '$username', username_pengawas = '$username_pengawas',  nim = '$nim', nama = '$nama', jenis_kelamin = '$jenis_kelamin', jurusan = '$jurusan', prodi = '$prodi', semester = '$semester', kelas = '$kelas', nohp = '$nohp', jumlah_alpha = '$jumlah_alpha' WHERE id = '$id'";
     }
 
     if (mysqli_query($conn, $query)) {
@@ -231,6 +232,7 @@ if (isset($_POST['hapus'])) {
                                             <th>Kelas</th>
                                             <th>Nomor HP</th>
                                             <th>Username Pengawas</th>
+                                            <th>Jumlah Alpha</th>
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
@@ -254,6 +256,7 @@ if (isset($_POST['hapus'])) {
                                                 <td><?= htmlspecialchars($data['kelas']); ?></td>
                                                 <td><?= htmlspecialchars($data['nohp']); ?></td>
                                                 <td><?= $data['username_pengawas']; ?></td>
+                                                <td><?= $data['jumlah_alpha']; ?></td>
                                                 <td>
                                                     <a href="#" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editModal<?= $data['id'] ?>">Edit</a>
                                                     <br><br>
@@ -317,6 +320,10 @@ if (isset($_POST['hapus'])) {
                                                                 <div class="form-group">
                                                                     <label for="nohp">Nomor HP</label>
                                                                     <input type="text" class="form-control" id="nohp" name="nohp" value="<?= $data['nohp']; ?>" required>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="jumlah_alpha">Jumlah Alpha</label>
+                                                                    <input type="number" class="form-control" id="jumlah_alpha" name="jumlah_alpha" value="<?= $data['jumlah_alpha']; ?>" required>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="username_pengawas">Pilih Pengawas</label>

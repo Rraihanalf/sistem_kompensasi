@@ -30,28 +30,31 @@
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Data Kompensasi  <a class="badge bg-info text-white" href="cetak.php">Cetak Data Kompensasi</a></h6>
+                           
+                        </div>
+                        <div class="card-body">
                             <?php $username = $_SESSION['username'];
                             $mhs = query("SELECT * FROM mahasiswa WHERE username = '$username'")[0];
                             $nim = $mhs['nim']; ?>
-                            <h6 class="m-0 font-weight-bold text-primary">Data Kompensasi <a class="badge bg-info text-white" href="cetak.php?nim=<?= $nim; ?>">Cetak Data Kompensasi</a></h6>
-                        </div>
-                        <div class="card-body">
                             <div class="table-responsive">
                                 <table class="table table-bordered" id="dataX" width="100%" cellspacing="0">
                                     <thead>
                                         <tr>
                                             <th>#</th>
                                             <th>NIM</th>
+                                            <th>Pengawas</th>
                                             <th>Jam</th>
                                             <th>Tanggal</th>
+                                            <th>Kegiatan</th>
                                             <th>Validasi</th>
                                             <th>Status</th>
+                                            <!-- <th>Aksi</th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <?php
-
-                                        $stmt = $conn->prepare("SELECT * FROM kompensasi WHERE nim = '$nim'");
+                                        $stmt = $conn->prepare("SELECT kompensasi.*, mahasiswa.nama AS nama_mahasiswa, pengawas.nama AS nama_pengawas FROM kompensasi JOIN mahasiswa ON kompensasi.nim = mahasiswa.nim JOIN pengawas ON kompensasi.id_pengawas = pengawas.id WHERE mahasiswa.nim = '$nim'");
                                         $stmt->execute();
                                         $kompensasi = $stmt->get_result();
                                         ?>
@@ -59,13 +62,87 @@
                                         <?php foreach ($kompensasi as $data) : ?>
                                             <tr>
                                                 <td><?= $i; ?></td>
-                                                <td><?= htmlspecialchars($data['nim']); ?></td>
+                                                <td><?= htmlspecialchars($data['nim']); ?> | <?= htmlspecialchars($data['nama_mahasiswa']); ?></td>
+                                                <td><?= htmlspecialchars($data['nama_pengawas']); ?></td>
                                                 <td><?= $data['jam']; ?></td>
                                                 <td><?= $data['tanggal']; ?></td>
+                                                <td><?= $data['kegiatan']; ?></td>
                                                 <td><?= $data['validasi']; ?></td>
                                                 <td><?= $data['status']; ?></td>
+                                                <!-- <td>
+                                                    <a href="#" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editModal<?= $data['id'] ?>">Edit</a>
+                                                    <br><br>
+                                                    <a href="#" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#hapusModal<?= $data['id'] ?>">Hapus</a>
+                                                </td> -->
                                             </tr>
 
+                                            <!-- Modal Edit Kompensasi -->
+                                            <div class="modal fade" id="editModal<?= $data['id']; ?>" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog modal-lg" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="editModalLabel">Edit Data</h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <form action="" method="POST">
+                                                                <input type="hidden" name="id" value="<?= $data['id']; ?>">
+                                                                <div class="form-group">
+                                                                    <label for="jam">Jam</label>
+                                                                    <input type="time" class="form-control" id="jam" name="jam" value="<?= $data['jam']; ?>" required>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="tanggal">Tanggal</label>
+                                                                    <input type="date" class="form-control" id="tanggal" name="tanggal" value="<?= $data['tanggal']; ?>" required>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="validasi">Validasi</label>
+                                                                    <select class="form-control" id="validasi" name="validasi" required>
+                                                                        <option value="Belum Diperiksa" <?= ($data['validasi'] == 'Belum Diperiksa') ? 'selected' : ''; ?>>Belum Diperiksa</option>
+                                                                        <option value="Valid" <?= ($data['validasi'] == 'Valid') ? 'selected' : ''; ?>>Valid</option>
+                                                                        <option value="Tidak Valid" <?= ($data['validasi'] == 'Tidak Valid') ? 'selected' : ''; ?>>Tidak Valid</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="status">Status</label>
+                                                                    <select class="form-control" id="status" name="status" required>
+                                                                        <option value="Belum Diperiksa" <?= ($data['status'] == 'Belum Diperiksa') ? 'selected' : ''; ?>>Belum Diperiksa</option>
+                                                                        <option value="Diterima" <?= ($data['status'] == 'Diterima') ? 'selected' : ''; ?>>Diterima</option>
+                                                                        <option value="Ditolak" <?= ($data['status'] == 'Ditolak') ? 'selected' : ''; ?>>Ditolak</option>
+                                                                    </select>
+                                                                </div>
+                                                                <button type="submit" name="edit" class="btn btn-primary w-100">Simpan</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Modal Hapus -->
+                                            <div class="modal fade" id="hapusModal<?= $data['id'] ?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel">Hapus Data Kompensasi</h5>
+                                                            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">×</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            Apakah Anda yakin ingin menghapus data dengan ID Kompensasi: <b><?= htmlspecialchars($data['id']) ?></b>?
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button class="btn btn-secondary" type="button" data-dismiss="modal">Batal</button>
+                                                            <form action="" method="post">
+                                                                <input type="hidden" name="id" value="<?= $data['id'] ?>">
+                                                                <button type="submit" name="hapus" class="btn btn-danger">Hapus</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
 
                                             <?php $i++; ?>
                                         <?php endforeach; ?>
